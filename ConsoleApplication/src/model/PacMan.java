@@ -12,7 +12,7 @@ public class PacMan {
 
 
     public PacMan() {
-        playingBoard = new Board();
+        playingBoard = new Board(3,1);
         sc = new Scanner(System.in);
 
     }
@@ -25,7 +25,7 @@ public class PacMan {
             System.out.println("Food left: " + playingBoard.getFoodCount());
             System.out.print("\nNext move: ");
             move = sc.next().charAt(0);
-            playingBoard.movePlayer(move);
+            playingBoard.movePieces(move);
             playingBoard.draw();
 
         }

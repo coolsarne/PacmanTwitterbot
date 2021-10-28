@@ -4,10 +4,16 @@ package model;
  * Arne Cools
  * 27/10/2021
  */
-public enum FieldCellStatus {
-    VWALL('|'), HWALL('―'), FREE(' '), FOOD('*'), PLAYER('P'), TLCORNER('⌜'), TRCORNER('⌝'), BLCORNER('⌞'), BRCORNER('⌟'), WALL('■');
+public enum FieldTileStatus {
+    FREE(' '),
+    FOOD('*'),
+    WALL('■'),
+    LIVINGPLAYER('P'),
+    DEADPLAYER('X'),
+    LIVINGSPOOK('S'),
+    DEADSPOOK('D');
 
-    private FieldCellStatus(char value){
+    private FieldTileStatus(char value) {
         this.value = value;
     }
 

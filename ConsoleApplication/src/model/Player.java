@@ -4,31 +4,15 @@ package model;
  * Arne Cools
  * 27/10/2021
  */
-public class Player {
+public class Player extends MovingBoardPiece{
+    private int score;
     private int lives;
-    private int xPos;
-    private int yPos;
 
-    public Player(int xPos, int yPos){
-        this.lives = 3;
-        this.xPos = xPos;
-        this.yPos = yPos;
-    }
 
-    public int getxPos() {
-        return xPos;
-    }
-
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
-    }
-
-    public int getyPos() {
-        return yPos;
-    }
-
-    public void setyPos(int yPos) {
-        this.yPos = yPos;
+    public Player(int xPos, int yPos, int lives){
+        super(xPos, yPos);
+        this.lives = lives;
+        this.score = 0;
     }
 
     public void setLives(int lives) {
@@ -37,5 +21,18 @@ public class Player {
 
     public int getLives() {
         return lives;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    @Override
+    public void move(FieldTileStatus[][] board) {
+
     }
 }
