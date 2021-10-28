@@ -9,17 +9,16 @@ import java.util.List;
  */
 public class Board {
     private FieldTileStatus[][] floorPlan;
-    private FieldTileStatus[][] foodPlan;
     private Player player;
     private List<Ghost> ghosts;
-    private int foodCount;
+    private int foodEaten;
+    private int totalFood;
 
     public Board(int playerLives, int amountOfGhosts) {
         this.floorPlan = new FieldTileStatus[10][13];
-        this.foodPlan = new FieldTileStatus[floorPlan.length][floorPlan[0].length];
         this.player = new Player(1, 1, playerLives);
-        foodCount = 0;
         ghosts = new ArrayList<>();
+        int foodEaten = 0;
         if (amountOfGhosts > 3) amountOfGhosts = 3;
         if (amountOfGhosts < 0) amountOfGhosts = 0;
         switch (amountOfGhosts) {
@@ -27,11 +26,11 @@ public class Board {
                 ghosts.add(new Ghost(new int[]{1, floorPlan[1].length - 2}, 1));
             case 2:
                 ghosts.add(new Ghost(new int[]{floorPlan.length - 2, 1}, 1));
+
             case 1:
                 ghosts.add(new Ghost(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
 
         }
-
 
 
     }
@@ -62,11 +61,10 @@ public class Board {
             floorPlan[ghost.getxPos()][ghost.getyPos()] = FieldTileStatus.LIVINGGHOST;
         }
 
-
-        updateFoodCount();
     }
 
     public void draw() {
+        System.out.println("\nscore = " + player.getScore());
         for (int i = 0; i < floorPlan.length; i++) {
             for (int j = 0; j < floorPlan[i].length; j++) {
                 System.out.print(floorPlan[i][j].getValue() + "\t");
@@ -76,53 +74,69 @@ public class Board {
 
     }
 
-    public void updateFloorplan(){
+    public void update() {
+        int oldFoodEaten = getFoodEaten();
         updatePlayerPosition();
         updateGhostPosition();
-        updateFoodCount();
-        for (Ghost ghost : ghosts) {
-            System.out.println("ghostPos = [" + ghost.getyPos() + ", " + ghost.getxPos() + "]");
+        collisionDetectionPlayerGhost();
+        //now we update the players score
+
+        player.setScore(player.getScore() + (foodEaten - oldFoodEaten) * 100);
+        if(foodEaten - oldFoodEaten == 0){
+            player.setScore(player.getScore() - 10);
         }
     }
 
 
-    public void updateFoodCount() {
-        int count = 0;
-        for (int i = 0; i < floorPlan.length; i++) {
-            for (int j = 0; j < floorPlan[i].length; j++) {
-                if (floorPlan[i][j] == FieldTileStatus.FOOD) count++;
-            }
-        }
-        foodCount = count;
-    }
-
-
-    private void updateGhostPosition() {
+    public void updateGhostPosition() {
         for (Ghost ghost : ghosts) {
-            List<FieldTileStatus> fieldTileStatusList = new ArrayList<FieldTileStatus>(ghost.getPathHashMap().values());
-            List<int[]> pathList = new ArrayList<int[]>(ghost.getPathHashMap().keySet());
-            int pos = pathList.size() - 2;
-            floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = fieldTileStatusList.get(pos);
-            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGGHOST){
-                floorPlan[ghost.getxPos()][ghost.getyPos()] = fieldTileStatusList.get(pos - 1);
+            List<FieldTileStatus> fieldTileStatusList = new ArrayList<>(ghost.getPathHashMap().values());
+            List<int[]> pathList = new ArrayList<>(ghost.getPathHashMap().keySet());
+            int previousPosistion = pathList.size() - 2;
+            floorPlan[pathList.get(previousPosistion)[0]][pathList.get(previousPosistion)[1]] = fieldTileStatusList.get(previousPosistion);
+            if (floorPlan[pathList.get(previousPosistion)[0]][pathList.get(previousPosistion)[1]] == FieldTileStatus.LIVINGGHOST) {
+                floorPlan[ghost.getxPos()][ghost.getyPos()] = fieldTileStatusList.get(previousPosistion - 1);
             }
-            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGPLAYER){
-                floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = FieldTileStatus.FREE;
+            if (floorPlan[pathList.get(previousPosistion)[0]][pathList.get(previousPosistion)[1]] == FieldTileStatus.LIVINGPLAYER) {
+                floorPlan[pathList.get(previousPosistion)[0]][pathList.get(previousPosistion)[1]] = FieldTileStatus.FREE;
             }
             floorPlan[ghost.getxPos()][ghost.getyPos()] = FieldTileStatus.LIVINGGHOST;
+
+
         }
     }
 
     private void updatePlayerPosition() {
-        List<int[]> pathList = new ArrayList<int[]>(player.getPathHashMap().keySet());
+        List<int[]> pathList = new ArrayList<>(player.getPathHashMap().keySet());
         int pos = pathList.size() - 2;
+        if (player.getLastEaten().equals(FieldTileStatus.FOOD)){
+            foodEaten++;
+        }
         floorPlan[pathList.get(pos)[1]][pathList.get(pos)[0]] = FieldTileStatus.FREE;
 
         floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.LIVINGPLAYER;
 
     }
 
+    private void collisionDetectionPlayerGhost(){
+        boolean playerFound = false;
+        for (int i = 0; i < floorPlan.length; i++) {
+            for (int j = 0; j < floorPlan[i].length; j++) {
+                if (floorPlan[i][j].equals(FieldTileStatus.LIVINGPLAYER)) playerFound = true;
+            }
+        }
+        if (!playerFound){
+            player.setAlive(false);
+            List<int[]> pathList = new ArrayList<>(player.getPathHashMap().keySet());
+            floorPlan[pathList.get(pathList.size() - 1)[1]][pathList.get(pathList.size() - 1)[0]] = FieldTileStatus.DEADPLAYER;
+        }
+    }
 
+    public boolean isWon(int bonus){
+        boolean won = getFoodEaten() >= getTotalFood();
+        if (won) player.setScore(player.getScore() + bonus);
+        return won;
+    }
 
     private void innerFieldLayout() { //TODO get rid of hardcode
         floorPlan[2][2] = FieldTileStatus.WALL;
@@ -155,11 +169,16 @@ public class Board {
         floorPlan[4][10] = FieldTileStatus.WALL;
         floorPlan[6][10] = FieldTileStatus.WALL;
         floorPlan[7][10] = FieldTileStatus.WALL;
+        totalFood = 11 * 8 - 30 - 1;
 
     }
 
-    public int getFoodCount() {
-        return foodCount;
+    public int getFoodEaten() {
+        return foodEaten;
+    }
+
+    public int getTotalFood() {
+        return totalFood;
     }
 
     public Player getPlayer() {

@@ -10,7 +10,7 @@ import java.util.List;
 public class Player extends MovingBoardPiece{
     private int score;
     private int lives;
-
+    private FieldTileStatus lastEaten;
 
     public Player(int xPos, int yPos, int lives){
         super(xPos, yPos);
@@ -18,6 +18,8 @@ public class Player extends MovingBoardPiece{
         this.score = 0;
         getPathHashMap().put(new int[]{1,1}, FieldTileStatus.FREE);
         getPathHashMap().put(new int[]{1,1}, FieldTileStatus.FREE);
+        lastEaten = FieldTileStatus.FREE;
+        setAlive(true);
     }
 
     public void setLives(int lives) {
@@ -37,6 +39,9 @@ public class Player extends MovingBoardPiece{
     }
 
 
+    public FieldTileStatus getLastEaten() {
+        return lastEaten;
+    }
 
     public void move(FieldTileStatus[][] floorPlan, char playerChoice) {
         int newXpos = getxPos();
@@ -62,9 +67,10 @@ public class Player extends MovingBoardPiece{
         }
         if (floorPlan[newYpos][newXpos] != FieldTileStatus.WALL) {
             getPathHashMap().put(new int[]{newXpos, newYpos}, floorPlan[newYpos][newXpos]);
+            lastEaten = floorPlan[newYpos][newXpos];
             setxPos(newXpos);
             setyPos(newYpos);
-        }
+        } else lastEaten = FieldTileStatus.FREE;
 
     }
 }

@@ -36,15 +36,15 @@ public class Ghost extends MovingBoardPiece {
         if (floorPlan[getxPos() - 1][getyPos()] != FieldTileStatus.WALL) possibleMoves.add(Moves.LEFT);
         if (floorPlan[getxPos() + 1][getyPos()] != FieldTileStatus.WALL) possibleMoves.add(Moves.RIGHT);
 
+        //Next, the ghost gets a random move to make except for going back
         Random rd = new Random();
         if (currentSpeed % moveTimer == 0) {
-            List<int[]> pathList = new ArrayList<int[]>(getPathHashMap().keySet());
+            List<int[]> pathList = new ArrayList<>(getPathHashMap().keySet());
             for (Iterator<Moves> iterator = possibleMoves.iterator(); iterator.hasNext(); ) {
                 Moves next =  iterator.next();
                 int[] futurePos = new int[]{getxPos() + next.getXChange(), getyPos() + next.getyChange()};
                 if (Arrays.equals(futurePos, pathList.get(pathList.size() - 2))) {
                     iterator.remove();
-
                 }
 
             }

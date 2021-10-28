@@ -21,28 +21,25 @@ public class PacMan {
         playingBoard.createFloorPlan();
         playingBoard.draw();
         char move;
-        while (isPlayerAlive() && !isWon()) {
-            System.out.println("Food left: " + playingBoard.getFoodCount());
+        while (playingBoard.getPlayer().isAlive() && !playingBoard.isWon(0)) {
             System.out.print("\nNext move: ");
             move = sc.next().charAt(0);
             playingBoard.getPlayer().move(playingBoard.getFloorPlan(), move);
             for (Ghost ghost : playingBoard.getGhosts()) {
                 ghost.move(playingBoard.getFloorPlan(), playingBoard.getPlayer().getxPos(), playingBoard.getPlayer().getyPos());
+                playingBoard.updateGhostPosition();
             }
-            playingBoard.updateFloorplan();
+            playingBoard.update();
             playingBoard.draw();
-
         }
+        if (!playingBoard.getPlayer().isAlive()) System.out.println("You lost :(");
+        if (playingBoard.isWon(1000)) System.out.println("Congratulations! You Won!");
+        System.out.println("Total score: " + playingBoard.getPlayer().getScore());
+
+
     }
 
-    private boolean isPlayerAlive() {
-        //TODO make player die
-        return true;
-    }
 
-    private boolean isWon(){
-        return playingBoard.getFoodCount() <= 0;
-    }
 
 
 }
