@@ -10,12 +10,14 @@ import java.util.Random;
  */
 public class Board {
     private FieldTileStatus[][] floorPlan;
+    private FieldTileStatus[][] foodPlan;
     private Player player;
     private List<Spook> spooks;
     private int foodCount;
 
     public Board(int playerLives, int amountOfSpooks) {
         this.floorPlan = new FieldTileStatus[10][13];
+        this.foodPlan = new FieldTileStatus[floorPlan.length][floorPlan[0].length];
         this.player = new Player(1, 1, playerLives);
         foodCount = 0;
         spooks = new ArrayList<>();
@@ -40,7 +42,9 @@ public class Board {
             for (int j = 0; j < floorPlan[i].length; j++) {
                 if (i == 0 || i == floorPlan.length - 1) floorPlan[i][j] = FieldTileStatus.WALL;
                 else if (j == 0 || j == floorPlan[i].length - 1) floorPlan[i][j] = FieldTileStatus.WALL;
-                else floorPlan[i][j] = FieldTileStatus.FOOD;
+                else {
+                    floorPlan[i][j] = FieldTileStatus.FOOD;
+                }
 
             }
         }
@@ -58,6 +62,7 @@ public class Board {
             floorPlan[spook.getxPos()][spook.getyPos()] = FieldTileStatus.LIVINGSPOOK;
         }
 
+
         updateFoodCount();
     }
 
@@ -68,7 +73,16 @@ public class Board {
             }
             System.out.print('\n');
         }
+
     }
+
+    public void updateFloorplan(){
+        updatePlayerPosition();
+        updateSpookPosition();
+        updateFoodCount();
+
+    }
+
 
     public void updateFoodCount() {
         int count = 0;
@@ -80,49 +94,18 @@ public class Board {
         foodCount = count;
     }
 
-    public void movePieces(char playerMove) {
-        //First the player moves a tile
-        int newXpos = player.getxPos();
-        int newYpos = player.getyPos();
-        switch (playerMove) {
-            case 'w':
-                newYpos = player.getyPos() - 1;
-                newXpos = player.getxPos();
-                break;
-            case 'a':
-                newXpos = player.getxPos() - 1;
-                newYpos = player.getyPos();
-                break;
-            case 's':
-                newYpos = player.getyPos() + 1;
-                newXpos = player.getxPos();
-                break;
-            case 'd':
-                newXpos = player.getxPos() + 1;
-                newYpos = player.getyPos();
-                break;
 
-        }
-        if (floorPlan[newYpos][newXpos] != FieldTileStatus.WALL) {
-            if (floorPlan[newYpos][newXpos] == FieldTileStatus.FOOD) foodCount--;
-            floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.FREE;
-            player.setxPos(newXpos);
-            player.setyPos(newYpos);
-            floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.LIVINGPLAYER;
-        }
-
-        //Then the spooks will move a tile
-        Random rd = new Random();
+    private void updateSpookPosition() {
         for (Spook spook : spooks) {
-            spook.move(floorPlan);
+//            floorPlan[spook.get]
         }
-
-
-
-
-        updateFoodCount();
     }
 
+    private void updatePlayerPosition() {
+        floorPlan[player.getPath().get(player.getPath().size() - 2)[1]][player.getPath().get(player.getPath().size() - 2)[0]] = FieldTileStatus.FREE;
+        floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.LIVINGPLAYER;
+
+    }
 
 
 
@@ -166,5 +149,15 @@ public class Board {
 
     public Player getPlayer() {
         return player;
+    }
+
+
+    public List<Spook> getSpooks() {
+        return spooks;
+    }
+
+
+    public FieldTileStatus[][] getFloorPlan() {
+        return floorPlan;
     }
 }

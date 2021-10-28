@@ -25,7 +25,11 @@ public class PacMan {
             System.out.println("Food left: " + playingBoard.getFoodCount());
             System.out.print("\nNext move: ");
             move = sc.next().charAt(0);
-            playingBoard.movePieces(move);
+            playingBoard.getPlayer().move(playingBoard.getFloorPlan(), move);
+            for (Spook spook : playingBoard.getSpooks()) {
+                spook.move(playingBoard.getFloorPlan(), playingBoard.getPlayer().getxPos(), playingBoard.getPlayer().getyPos());
+            }
+            playingBoard.updateFloorplan();
             playingBoard.draw();
 
         }
