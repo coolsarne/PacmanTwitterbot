@@ -97,12 +97,20 @@ public class Board {
 
     private void updateSpookPosition() {
         for (Spook spook : spooks) {
-//            floorPlan[spook.get]
+            List<FieldTileStatus> fieldTileStatusList = new ArrayList<FieldTileStatus>(spook.getPathHashMap().values());
+            List<int[]> pathList = new ArrayList<int[]>(spook.getPathHashMap().keySet());
+            int pos = pathList.size() - 2;
+            floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = fieldTileStatusList.get(pos);
+
+            floorPlan[spook.getxPos()][spook.getyPos()] = FieldTileStatus.LIVINGSPOOK;
         }
     }
 
     private void updatePlayerPosition() {
-        floorPlan[player.getPath().get(player.getPath().size() - 2)[1]][player.getPath().get(player.getPath().size() - 2)[0]] = FieldTileStatus.FREE;
+        List<int[]> pathList = new ArrayList<int[]>(player.getPathHashMap().keySet());
+        int pos = pathList.size() - 2;
+        floorPlan[pathList.get(pos)[1]][pathList.get(pos)[0]] = FieldTileStatus.FREE;
+
         floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.LIVINGPLAYER;
 
     }

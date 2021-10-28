@@ -16,7 +16,7 @@ public class Player extends MovingBoardPiece{
         super(xPos, yPos);
         this.lives = lives;
         this.score = 0;
-        super.getPath().add(new int[]{1,1});
+        getPathHashMap().put(new int[]{1,1}, FieldTileStatus.FREE);
     }
 
     public void setLives(int lives) {
@@ -34,6 +34,7 @@ public class Player extends MovingBoardPiece{
     public void setScore(int score) {
         this.score = score;
     }
+
 
 
     public void move(FieldTileStatus[][] floorPlan, char playerChoice) {
@@ -59,7 +60,7 @@ public class Player extends MovingBoardPiece{
 
         }
         if (floorPlan[newYpos][newXpos] != FieldTileStatus.WALL) {
-            getPath().add(new int[]{newXpos, newYpos});
+            getPathHashMap().put(new int[]{newXpos, newYpos}, floorPlan[newYpos][newXpos]);
             setxPos(newXpos);
             setyPos(newYpos);
         }

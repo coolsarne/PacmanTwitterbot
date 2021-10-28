@@ -1,5 +1,6 @@
 package model;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,13 +12,14 @@ public abstract class MovingBoardPiece {
     private int xPos;
     private int yPos;
     private boolean isAlive;
-    private List<int[]> path;
+    private LinkedHashMap<int[], FieldTileStatus> pathHashMap;
+
 
     public MovingBoardPiece(int xPos, int yPos){
         this.xPos = xPos;
         this.yPos = yPos;
         isAlive = true;
-        this.path = new LinkedList<>();
+        pathHashMap = new LinkedHashMap<>();
     }
 
     public boolean isAlive() {
@@ -44,11 +46,9 @@ public abstract class MovingBoardPiece {
         this.yPos = yPos;
     }
 
-    public List<int[]> getPath() {
-        return path;
+    public LinkedHashMap<int[], FieldTileStatus> getPathHashMap() {
+        return pathHashMap;
     }
 
-    public void setPath(List<int[]> path) {
-        this.path = path;
-    }
+
 }
