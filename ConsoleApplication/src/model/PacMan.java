@@ -12,7 +12,7 @@ public class PacMan {
 
 
     public PacMan() {
-        playingBoard = new Board(3,2);
+        playingBoard = new Board(3,3);
         sc = new Scanner(System.in);
 
     }
@@ -26,8 +26,8 @@ public class PacMan {
             System.out.print("\nNext move: ");
             move = sc.next().charAt(0);
             playingBoard.getPlayer().move(playingBoard.getFloorPlan(), move);
-            for (Spook spook : playingBoard.getSpooks()) {
-                spook.move(playingBoard.getFloorPlan(), playingBoard.getPlayer().getxPos(), playingBoard.getPlayer().getyPos());
+            for (Ghost ghost : playingBoard.getGhosts()) {
+                ghost.move(playingBoard.getFloorPlan(), playingBoard.getPlayer().getxPos(), playingBoard.getPlayer().getyPos());
             }
             playingBoard.updateFloorplan();
             playingBoard.draw();

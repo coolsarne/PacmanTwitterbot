@@ -6,14 +6,14 @@ import java.util.*;
  * Arne Cools
  * 27/10/2021
  */
-public class Spook extends MovingBoardPiece {
-    private int moveTimer; //The amount of moves a player has to make before the spook moves 1 tile.
+public class Ghost extends MovingBoardPiece {
+    private int moveTimer; //The amount of moves a player has to make before the ghost moves 1 tile.
     private int currentSpeed;
     private boolean moveTowardsPlayer;
     private int[] spawnPoint;
 
 
-    public Spook(int[] spawnPoint, int moveTimer) {
+    public Ghost(int[] spawnPoint, int moveTimer) {
         super(spawnPoint[0], spawnPoint[1]);
         this.spawnPoint = spawnPoint;
         this.moveTimer = moveTimer;
@@ -29,7 +29,7 @@ public class Spook extends MovingBoardPiece {
     }
 
     public void move(FieldTileStatus[][] floorPlan, int xPlayer, int yPlayer) {
-        // First we check the moves the spook could possibly make
+        // First we check the moves the ghost could possibly make
         List<Moves> possibleMoves = new ArrayList();
         if (floorPlan[getxPos()][getyPos() - 1] != FieldTileStatus.WALL) possibleMoves.add(Moves.UP);
         if (floorPlan[getxPos()][getyPos() + 1] != FieldTileStatus.WALL) possibleMoves.add(Moves.DOWN);
@@ -51,8 +51,8 @@ public class Spook extends MovingBoardPiece {
 
             Moves move = possibleMoves.get(rd.nextInt(possibleMoves.size()));
             int[] futurePos = new int[]{getxPos() + move.getXChange(), getyPos() + move.getyChange()};
-            // If there is a spook at the next tile, go to other direction
-            if (floorPlan[futurePos[0]][futurePos[1]].equals(FieldTileStatus.LIVINGSPOOK)){
+            // If there is a ghost at the next tile, go to other direction
+            if (floorPlan[futurePos[0]][futurePos[1]].equals(FieldTileStatus.LIVINGGHOST)){
                 setxPos(pathList.get(pathList.size() - 2)[0]);
                 setyPos(pathList.get(pathList.size() - 2)[1]);
             } else {

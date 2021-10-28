@@ -10,8 +10,8 @@ public enum FieldTileStatus {
     WALL('■'),
     LIVINGPLAYER('P'),
     DEADPLAYER('X'),
-    LIVINGSPOOK('S'),
-    DEADSPOOK('D');
+    LIVINGGHOST('G'),
+    DEADGHOST('D');
 
     private FieldTileStatus(char value) {
         this.value = value;

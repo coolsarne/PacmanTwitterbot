@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Arne Cools
@@ -12,24 +11,24 @@ public class Board {
     private FieldTileStatus[][] floorPlan;
     private FieldTileStatus[][] foodPlan;
     private Player player;
-    private List<Spook> spooks;
+    private List<Ghost> ghosts;
     private int foodCount;
 
-    public Board(int playerLives, int amountOfSpooks) {
+    public Board(int playerLives, int amountOfGhosts) {
         this.floorPlan = new FieldTileStatus[10][13];
         this.foodPlan = new FieldTileStatus[floorPlan.length][floorPlan[0].length];
         this.player = new Player(1, 1, playerLives);
         foodCount = 0;
-        spooks = new ArrayList<>();
-        if (amountOfSpooks > 3) amountOfSpooks = 3;
-        if (amountOfSpooks < 0) amountOfSpooks = 0;
-        switch (amountOfSpooks) {
+        ghosts = new ArrayList<>();
+        if (amountOfGhosts > 3) amountOfGhosts = 3;
+        if (amountOfGhosts < 0) amountOfGhosts = 0;
+        switch (amountOfGhosts) {
             case 3:
-                spooks.add(new Spook(new int[]{1, floorPlan[1].length - 2}, 1));
+                ghosts.add(new Ghost(new int[]{1, floorPlan[1].length - 2}, 1));
             case 2:
-                spooks.add(new Spook(new int[]{floorPlan.length - 2, 1}, 1));
+                ghosts.add(new Ghost(new int[]{floorPlan.length - 2, 1}, 1));
             case 1:
-                spooks.add(new Spook(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
+                ghosts.add(new Ghost(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
 
         }
 
@@ -59,8 +58,8 @@ public class Board {
 
         //Print moving boardpieces
         floorPlan[player.getyPos()][player.getxPos()] = FieldTileStatus.LIVINGPLAYER;
-        for (Spook spook : spooks) {
-            floorPlan[spook.getxPos()][spook.getyPos()] = FieldTileStatus.LIVINGSPOOK;
+        for (Ghost ghost : ghosts) {
+            floorPlan[ghost.getxPos()][ghost.getyPos()] = FieldTileStatus.LIVINGGHOST;
         }
 
 
@@ -79,10 +78,10 @@ public class Board {
 
     public void updateFloorplan(){
         updatePlayerPosition();
-        updateSpookPosition();
+        updateGhostPosition();
         updateFoodCount();
-        for (Spook spook : spooks) {
-            System.out.println("spookPos = [" + spook.getyPos() + ", " + spook.getxPos() + "]");
+        for (Ghost ghost : ghosts) {
+            System.out.println("ghostPos = [" + ghost.getyPos() + ", " + ghost.getxPos() + "]");
         }
     }
 
@@ -98,19 +97,19 @@ public class Board {
     }
 
 
-    private void updateSpookPosition() {
-        for (Spook spook : spooks) {
-            List<FieldTileStatus> fieldTileStatusList = new ArrayList<FieldTileStatus>(spook.getPathHashMap().values());
-            List<int[]> pathList = new ArrayList<int[]>(spook.getPathHashMap().keySet());
+    private void updateGhostPosition() {
+        for (Ghost ghost : ghosts) {
+            List<FieldTileStatus> fieldTileStatusList = new ArrayList<FieldTileStatus>(ghost.getPathHashMap().values());
+            List<int[]> pathList = new ArrayList<int[]>(ghost.getPathHashMap().keySet());
             int pos = pathList.size() - 2;
             floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = fieldTileStatusList.get(pos);
-            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGSPOOK){
-                floorPlan[spook.getxPos()][spook.getyPos()] = fieldTileStatusList.get(pos - 1);
+            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGGHOST){
+                floorPlan[ghost.getxPos()][ghost.getyPos()] = fieldTileStatusList.get(pos - 1);
             }
             if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGPLAYER){
                 floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = FieldTileStatus.FREE;
             }
-            floorPlan[spook.getxPos()][spook.getyPos()] = FieldTileStatus.LIVINGSPOOK;
+            floorPlan[ghost.getxPos()][ghost.getyPos()] = FieldTileStatus.LIVINGGHOST;
         }
     }
 
@@ -168,8 +167,8 @@ public class Board {
     }
 
 
-    public List<Spook> getSpooks() {
-        return spooks;
+    public List<Ghost> getGhosts() {
+        return ghosts;
     }
 
 
