@@ -1,9 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Arne Cools
@@ -40,25 +37,30 @@ public class Spook extends MovingBoardPiece {
         if (floorPlan[getxPos() + 1][getyPos()] != FieldTileStatus.WALL) possibleMoves.add(Moves.RIGHT);
 
         Random rd = new Random();
-        if (currentSpeed % moveTimer == 0 && possibleMoves.size() == 2) {
-            Moves move = possibleMoves.get(0);
-            System.out.println("move = " + move);
+        if (currentSpeed % moveTimer == 0) {
             List<int[]> pathList = new ArrayList<int[]>(getPathHashMap().keySet());
-            int[] futurePos = new int[]{getxPos() + move.getXChange(), getyPos() + move.getyChange()};
-            if (Arrays.equals(futurePos, pathList.get(pathList.size() - 2))) {
-                move = possibleMoves.get(1);
-                System.out.println("move = " + move);
+            for (Iterator<Moves> iterator = possibleMoves.iterator(); iterator.hasNext(); ) {
+                Moves next =  iterator.next();
+                int[] futurePos = new int[]{getxPos() + next.getXChange(), getyPos() + next.getyChange()};
+                if (Arrays.equals(futurePos, pathList.get(pathList.size() - 2))) {
+                    iterator.remove();
+
+                }
+
             }
-            setxPos(getxPos() + move.getXChange());
-            setyPos(getyPos() + move.getyChange());
-            getPathHashMap().put(new int[]{getxPos(), getyPos()}, floorPlan[getxPos()][getyPos()]);
 
-        } else if (currentSpeed % moveTimer == 0) {
             Moves move = possibleMoves.get(rd.nextInt(possibleMoves.size()));
-            setxPos(getxPos() + move.getXChange());
-            setyPos(getyPos() + move.getyChange());
-            getPathHashMap().put(new int[]{getxPos(), getyPos()}, floorPlan[getxPos()][getyPos()]);
+            int[] futurePos = new int[]{getxPos() + move.getXChange(), getyPos() + move.getyChange()};
+            // If there is a spook at the next tile, go to other direction
+            if (floorPlan[futurePos[0]][futurePos[1]].equals(FieldTileStatus.LIVINGSPOOK)){
+                setxPos(pathList.get(pathList.size() - 2)[0]);
+                setyPos(pathList.get(pathList.size() - 2)[1]);
+            } else {
+                setxPos(getxPos() + move.getXChange());
+                setyPos(getyPos() + move.getyChange());
+            }
 
+            getPathHashMap().put(new int[]{getxPos(), getyPos()}, floorPlan[getxPos()][getyPos()]);
         }
         currentSpeed++;
 

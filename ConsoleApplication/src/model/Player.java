@@ -17,6 +17,7 @@ public class Player extends MovingBoardPiece{
         this.lives = lives;
         this.score = 0;
         getPathHashMap().put(new int[]{1,1}, FieldTileStatus.FREE);
+        getPathHashMap().put(new int[]{1,1}, FieldTileStatus.FREE);
     }
 
     public void setLives(int lives) {

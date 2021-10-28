@@ -29,7 +29,8 @@ public class Board {
             case 2:
                 spooks.add(new Spook(new int[]{floorPlan.length - 2, 1}, 1));
             case 1:
-                spooks.add(new Spook(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
+//                spooks.add(new Spook(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
+                spooks.add(new Spook(new int[]{1,2}, 1));
         }
 
 
@@ -80,7 +81,9 @@ public class Board {
         updatePlayerPosition();
         updateSpookPosition();
         updateFoodCount();
-
+        for (Spook spook : spooks) {
+            System.out.println("spookPos = [" + spook.getyPos() + ", " + spook.getxPos() + "]");
+        }
     }
 
 
@@ -101,7 +104,12 @@ public class Board {
             List<int[]> pathList = new ArrayList<int[]>(spook.getPathHashMap().keySet());
             int pos = pathList.size() - 2;
             floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = fieldTileStatusList.get(pos);
-
+            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGSPOOK){
+                floorPlan[spook.getxPos()][spook.getyPos()] = fieldTileStatusList.get(pos - 1);
+            }
+            if (floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] == FieldTileStatus.LIVINGPLAYER){
+                floorPlan[pathList.get(pos)[0]][pathList.get(pos)[1]] = FieldTileStatus.FREE;
+            }
             floorPlan[spook.getxPos()][spook.getyPos()] = FieldTileStatus.LIVINGSPOOK;
         }
     }
