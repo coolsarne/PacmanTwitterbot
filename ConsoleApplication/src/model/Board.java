@@ -29,8 +29,8 @@ public class Board {
             case 2:
                 spooks.add(new Spook(new int[]{floorPlan.length - 2, 1}, 1));
             case 1:
-//                spooks.add(new Spook(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
-                spooks.add(new Spook(new int[]{1,2}, 1));
+                spooks.add(new Spook(new int[]{floorPlan.length - 2, floorPlan[floorPlan.length - 2].length - 2}, 1));
+
         }
 
 

@@ -12,7 +12,7 @@ public class PacMan {
 
 
     public PacMan() {
-        playingBoard = new Board(3,1);
+        playingBoard = new Board(3,2);
         sc = new Scanner(System.in);
 
     }
