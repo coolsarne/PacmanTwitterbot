@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ConsoleApplication/ConsoleApplication.iml" filepath="$PROJECT_DIR$/ConsoleApplication/ConsoleApplication.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TwitterBotApplication/TwitterBotApplication.iml" filepath="$PROJECT_DIR$/TwitterBotApplication/TwitterBotApplication.iml" />
     </modules>
   </component>
 </project>
