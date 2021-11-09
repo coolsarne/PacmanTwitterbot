@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,10 +71,10 @@ public class Board {
             for (int j = 0; j < floorPlan[i].length; j++) {
                 switch (floorPlan[i][j]) {
                     case FOOD:
-                        sb.append("\uD83D\uDD38");
+                        sb.append("✳️");
                         break;
                     case FREE:
-                        sb.append("⬜️");
+                        sb.append("\uD83D\uDFE9");
                         break;
 
                     case LIVINGPLAYER:

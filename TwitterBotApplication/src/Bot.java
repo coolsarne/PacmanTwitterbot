@@ -1,8 +1,5 @@
 import model.PacMan;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.File;
@@ -22,26 +19,19 @@ public class Bot {
 
         pacMan.start();
 
+        twitter.updateStatus(pacMan.getBoard());
+        long latestTweetID = getLatestTweet().getId();
+        replyToTweet("UP", latestTweetID);
+        replyToTweet("DOWN", latestTweetID);
+        replyToTweet("LEFT", latestTweetID);
+        replyToTweet("RIGHT", latestTweetID);
+
+
+
 //        Timer timer = new Timer();
 //        timer.scheduleAtFixedRate(new TweetTask(), 15000, 15000 );
 
-        twitter.updateStatus(pacMan.getBoard());
-
-    }
-
-    private static Twitter getTwitterInstance(){
-        FileReader fileReader = new FileReader();
-        String[] tokensArray = fileReader.readFile();
-
-
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
-                .setOAuthConsumerKey(tokensArray[0])            //first line in config file
-                .setOAuthConsumerSecret(tokensArray[1])         //second line in config file
-                .setOAuthAccessToken(tokensArray[2])            //third line in config file
-                .setOAuthAccessTokenSecret(tokensArray[3]);     //fourth line in config file
-        TwitterFactory tf = new TwitterFactory(cb.build());
-        return tf.getInstance();
+//        twitter.updateStatus(pacMan.getBoard());
     }
 
     private static class TweetTask extends TimerTask{
@@ -57,17 +47,48 @@ public class Bot {
     }
 
     private static Status getLatestTweet(){
-        List<Status> statusList = null;
+        List<Status> statusList = new LinkedList<>();
         try {
             statusList = twitter.getUserTimeline("@PacmanBotGame");
         } catch (TwitterException e){
             e.printStackTrace();
         }
-
-        for (Status status : statusList) {
-            System.out.println("status = " + status);
-        }
         return statusList.get(0);
+    }
+
+    private static List<Status> getFiveLatestTweets(){
+        List<Status> statusList = new LinkedList<>();
+        try {
+            statusList = twitter.getUserTimeline("@PacmanBotGame");
+        } catch (TwitterException e){
+            e.printStackTrace();
+        }
+        List<Status> lastFive = new LinkedList<>();
+        for (int i = 0; i < 5; i++) {
+            lastFive.add(statusList.get(i));
+        }
+        return lastFive;
+    }
+
+    private static void replyToTweet(String message, long ID) throws TwitterException {
+        StatusUpdate statusUpdate = new StatusUpdate(message);
+        statusUpdate.inReplyToStatusId(ID);
+        twitter.updateStatus(statusUpdate);
+    }
+
+    private static Twitter getTwitterInstance(){
+        FileReader fileReader = new FileReader();
+        String[] tokensArray = fileReader.readFile();
+
+
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(tokensArray[0])            //first line in config file
+                .setOAuthConsumerSecret(tokensArray[1])         //second line in config file
+                .setOAuthAccessToken(tokensArray[2])            //third line in config file
+                .setOAuthAccessTokenSecret(tokensArray[3]);     //fourth line in config file
+        TwitterFactory tf = new TwitterFactory(cb.build());
+        return tf.getInstance();
     }
 
     public static class FileReader{
