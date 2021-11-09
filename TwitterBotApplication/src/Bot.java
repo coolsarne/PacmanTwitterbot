@@ -15,30 +15,80 @@ import java.util.*;
 public class Bot {
     public static Twitter twitter = getTwitterInstance();
     public static PacMan pacMan = new PacMan();
-    public static void main(String[] args) throws TwitterException {
+    public static Timer timer = new Timer();
 
+    public static void main(String[] args) throws TwitterException, InterruptedException {
+        deleteAllPreviousTweets();
+
+        Thread.sleep(60000);
+        twitter.updateStatus("A new game will start soon!");
+        Thread.sleep(30000);
         pacMan.start();
 
         twitter.updateStatus(pacMan.getBoard());
         long latestTweetID = getLatestTweet().getId();
         replyToTweet("UP", latestTweetID);
-        replyToTweet("DOWN", latestTweetID);
         replyToTweet("LEFT", latestTweetID);
+        replyToTweet("DOWN", latestTweetID);
         replyToTweet("RIGHT", latestTweetID);
 
+        timer.scheduleAtFixedRate(new TweetTask(), 60000, 60000);
 
-
-//        Timer timer = new Timer();
-//        timer.scheduleAtFixedRate(new TweetTask(), 15000, 15000 );
-
-//        twitter.updateStatus(pacMan.getBoard());
     }
 
-    private static class TweetTask extends TimerTask{
+    private static class TweetTask extends TimerTask {
         @Override
         public void run() {
             try {
-                twitter.updateStatus(pacMan.getBoard());
+                int countUP = 0;
+                int countDOWN = 0;
+                int countLEFT = 0;
+                int countRIGHT = 0;
+                List<Status> previousStatuses = getFiveLatestTweets();
+                for (Status status : previousStatuses) {
+                    switch (status.getText()) {
+                        case "LEFT":
+                            countLEFT = status.getFavoriteCount();
+                            break;
+                        case "RIGHT":
+                            countRIGHT = status.getFavoriteCount();
+                            break;
+                        case "UP":
+                            countUP = status.getFavoriteCount();
+                            break;
+                        case "DOWN":
+                            countDOWN = status.getFavoriteCount();
+                            break;
+                    }
+                }
+                int highestVoted = Math.max(countDOWN, Math.max(countUP, Math.max(countLEFT, countRIGHT)));
+                char nextMove = 'w';
+                if (highestVoted == countUP) nextMove = 'w';
+                else if (highestVoted == countLEFT) nextMove = 'a';
+                else if (highestVoted == countDOWN) nextMove = 's';
+                else nextMove = 'd';
+
+                pacMan.movePieces(nextMove);
+
+                if (pacMan.checkIfOver() == 0) {
+                    twitter.updateStatus(pacMan.getBoard());
+                    long latestTweetID = getLatestTweet().getId();
+                    replyToTweet("UP", latestTweetID);
+                    replyToTweet("DOWN", latestTweetID);
+                    replyToTweet("LEFT", latestTweetID);
+                    replyToTweet("RIGHT", latestTweetID);
+                } else if (pacMan.checkIfOver() == 1){
+                    twitter.updateStatus(":(\n" + pacMan.getBoard());
+                    replyToTweet("Game Over!", getLatestTweet().getId());
+                    timer.cancel();
+                } else if (pacMan.checkIfOver() == 2){
+                    twitter.updateStatus(":D\n" + pacMan.getBoard());
+                    replyToTweet("Congratulations! Player wins!", getLatestTweet().getId());
+                    timer.cancel();
+                } else {
+                    twitter.updateStatus("Error: Something went wrong.\nPlease contact @arnecools3");
+                    timer.cancel();
+                }
 
             } catch (TwitterException e) {
                 e.printStackTrace();
@@ -46,21 +96,37 @@ public class Bot {
         }
     }
 
-    private static Status getLatestTweet(){
+    private static Status getLatestTweet() {
         List<Status> statusList = new LinkedList<>();
         try {
             statusList = twitter.getUserTimeline("@PacmanBotGame");
-        } catch (TwitterException e){
+        } catch (TwitterException e) {
             e.printStackTrace();
         }
         return statusList.get(0);
     }
 
-    private static List<Status> getFiveLatestTweets(){
+    private static void deleteAllPreviousTweets(){
         List<Status> statusList = new LinkedList<>();
         try {
             statusList = twitter.getUserTimeline("@PacmanBotGame");
-        } catch (TwitterException e){
+
+            for (Status status : statusList) {
+                System.out.println(status.getText());
+                twitter.destroyStatus(status.getId());
+            }
+            System.out.println("All tweets deleted");
+
+        } catch (TwitterException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<Status> getFiveLatestTweets() {
+        List<Status> statusList = new LinkedList<>();
+        try {
+            statusList = twitter.getUserTimeline("@PacmanBotGame");
+        } catch (TwitterException e) {
             e.printStackTrace();
         }
         List<Status> lastFive = new LinkedList<>();
@@ -76,7 +142,7 @@ public class Bot {
         twitter.updateStatus(statusUpdate);
     }
 
-    private static Twitter getTwitterInstance(){
+    private static Twitter getTwitterInstance() {
         FileReader fileReader = new FileReader();
         String[] tokensArray = fileReader.readFile();
 
@@ -91,7 +157,7 @@ public class Bot {
         return tf.getInstance();
     }
 
-    public static class FileReader{
+    public static class FileReader {
         public String[] readFile() {
             StringBuilder tokensStringBuilder = new StringBuilder();
             try {

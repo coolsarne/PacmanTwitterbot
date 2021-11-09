@@ -67,6 +67,7 @@ public class Board {
     public String draw() {
         StringBuilder sb = new StringBuilder();
         sb.append("⭐️" + player.getScore() + "\n");
+//        sb.append("⭐️" + 10000 + "\n");
         for (int i = 0; i < floorPlan.length; i++) {
             for (int j = 0; j < floorPlan[i].length; j++) {
                 switch (floorPlan[i][j]) {
